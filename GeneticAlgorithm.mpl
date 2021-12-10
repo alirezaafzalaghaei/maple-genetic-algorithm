@@ -1,10 +1,10 @@
- GeneticAlgorithm := module ()
+GeneticAlgorithm := module ()
 	description "Genetic algorithm";
 	export GA;
 	option package;
 	local random_float, random_int, crossover, mutation, selection, get_costs;
 	random_float := proc (n, a, b)
-		return RandomTools:-Generate(('Vector')(float(range = a .. b), n)) 
+		return RandomTools:-Generate(('Vector')(float(range = a .. b), n))
 	end proc;
 	random_int := proc (n, a, b)
 		return RandomTools:-Generate(('Vector')(integer(range = a .. b), n))
@@ -14,7 +14,7 @@
 	end proc;
 	mutation := proc (x)
 		local t;
-		t := random_float(numelems(x), -abs(max(x)), abs(max(x)));
+		t := random_float(numelems(x), -abs(floor(max(x))), abs(floor(max(x))));
 		return x+t;
 	end proc;
 	selection := proc (population, k := 7)
@@ -43,7 +43,7 @@
 	end proc;
 
 	GA := proc (cost, Dimension, bd_min, bd_max, Npop := 10, Nchildren := 5, mutation_prob := .6, epsilon := 0.1e-5, verbose := false)
-		local history, population, iter, j, tmp, x, y, prob, child, best, c, global_best;
+		local i, history, population, iter, j, tmp, x, y, prob, child, best, c, global_best;
 		population := [seq(random_float(Dimension, bd_min, bd_max), i = 1 .. Npop)];
 		history := [];
 		for iter to Niteration do
@@ -59,7 +59,7 @@
 			end do;
 			tmp := get_costs(population, true);
 			best, c := tmp[1], tmp[2];
-			history := [op(history), c];			
+			history := [op(history), c];
 			global_best := population[best[1]];
 			population := population[best[1..Npop]];
 
@@ -69,11 +69,10 @@
 			 	end if;
 			 	break;
 			end if;
-			if verbose = true and (`mod`(iter, 20) = 0 or iter = 1 or iter = Niteration) then 
+			if verbose = true and (`mod`(iter, 20) = 0 or iter = 1 or iter = Niteration) then
 				printf("iteratin %04d, cost=%.02e\n", iter, c);
 			end if;
 		end do;
 		return global_best, history;
 	end proc;
 end module;
-
